@@ -1,6 +1,6 @@
 const flatten = require('lodash/flatten');
-const { printHeader, askQuestions, handleError, formatLapse } = require('../cli');
-const logger = require('../logger');
+const { printHeader, askQuestions, handleError, formatLapse } = require('../utils/cli');
+const logger = require('../utils/logger');
 const scanFolder = require('./scan-folder');
 
 let startTime;

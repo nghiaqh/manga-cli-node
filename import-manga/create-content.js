@@ -1,6 +1,6 @@
 const {Author, Genre, Manga, Page, Series} = require('../models');
-const { getItemName } = require('../fs');
-const logger = require('../logger');
+const { getItemName } = require('../utils/fs');
+const logger = require('../utils/logger');
 
 /**
  * Async find or create wrapper for loopback findOrCreate

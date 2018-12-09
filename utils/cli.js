@@ -8,9 +8,11 @@ function parseProcessArgs() {
 
   const options = {}
   const args = Object.assign([], process.argv).splice(2)
+  console.log(args);
 
   options.folderPath = args[0]
-  options.limit = args[1]
+  options.output = args[1]
+  options.limit = args[2]
 
   args.forEach((arg, index) => {
     switch (arg) {
@@ -19,8 +21,8 @@ function parseProcessArgs() {
         options.limit = index < args.length ? args[index + 1] : 10
         break;
       case '-o':
-      case '--overwrite':
-        options.overwrite = true
+      case '--output':
+        options.output = true
         break;
     }
   })

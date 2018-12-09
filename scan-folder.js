@@ -1,10 +1,7 @@
 const {
   isFolder,
-  isFile,
   getFolderItems,
-  filterImages,
-  getItemName,
-  validateItemName
+  filterImages
 } = require('./utils/fs');
 const path = require('path');
 
@@ -20,7 +17,6 @@ const chapterPattern = /\/(chapter|c) [0-9]{2,}[^\/.]{0,}/i;
 function scanFolder(folderPath, limit = 0, data = {}) {
   if (!isFolder(folderPath)) return data
 
-  const { dir, base } = path.parse(folderPath);
   const matchContainer = folderPath.match(containerPattern);
   const matchVol = folderPath.match(volPattern);
   const matchChapter = folderPath.match(chapterPattern);
@@ -30,8 +26,9 @@ function scanFolder(folderPath, limit = 0, data = {}) {
   const chapter = matchChapter ? matchChapter[0].slice(1) : null;
 
   const { files, folders } = getFolderItems(folderPath);
+  const images = filterImages(files);
 
-  updateData(container, vol, chapter, files, data);
+  updateData(container, vol, chapter, images, data);
 
   folders.slice(0, Number(limit) || folders.length)
     .forEach(folder => scanFolder(folder, 0, data));
@@ -68,6 +65,13 @@ function updateData(container, vol, chapter, files, data) {
     };
   }
 
+  const authors = getAuthors(container)
+  if (!data.authors) {
+    data.authors = authors
+  } else {
+    authors.forEach(author => data.authors.includes(author) ? '' : data.authors.push(author))
+  }
+
   if(vol && data[container].volumes.indexOf(vol) < 0) {
     data[container].volumes.push(vol);
   }
@@ -86,6 +90,13 @@ function updateData(container, vol, chapter, files, data) {
   });
 
   return data;
+}
+
+function getAuthors(title) {
+  var authorPattern = /\[[^\[^\]^//.]+\]/
+  const authors = authorPattern.exec(title)[0].replace(/[\[\]]/g, '')
+    .split(',').map(a => a.trim())
+  return authors
 }
 
 module.exports = {

@@ -3,11 +3,15 @@ const { parseProcessArgs } = require('../utils/cli')
 const { scanFolder } = require('../scan-folder')
 const fs = require('fs');
 
-const { folderPath, limit } = parseProcessArgs();
+const { folderPath, limit, output } = parseProcessArgs();
 const data = scanFolder(folderPath, limit);
-console.log(Object.keys(data));
 
-if (folderPath.includes('/Hentai/Oneshot')) {
+if (output) {
+  fs.writeFile(output, JSON.stringify(data), err => {
+    if (err) throw err;
+    console.log('Wrote data to ' + output);
+  });
+} else if (folderPath.includes('/Hentai/Oneshot')) {
   fs.writeFile('test-data/h-oneshot.json', JSON.stringify(data), err => {
     if (err) throw err;
     console.log('Wrote data to test-data/h-oneshot.json');

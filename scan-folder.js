@@ -51,7 +51,8 @@ function scanFolder(folderPath, limit = 0, data = {}) {
  *     images: [
  *       {name, url, chapter, vol}
  *     ]
- *   }
+ *   },
+ *   authors: [a, b, c]
  * }
  */
 function updateData(container, vol, chapter, files, data) {

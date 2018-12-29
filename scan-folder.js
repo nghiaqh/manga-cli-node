@@ -2,20 +2,20 @@ const {
   isFolder,
   getFolderItems,
   filterImages
-} = require('./utils/fs');
+} = require('./lib/fs');
 const path = require('path');
 
 // /[author] manga title
-const containerPattern = /\/\[[^\[^\]^//.]+\][^\[^\]^//.]+/;
+const containerPattern = /\/\[[^\[^\]^//.]+\][^\[^\]^//]+/;
 
 // /vol 01; /volume 01
-const volPattern = /\/(vol|volume) [0-9]{2,}[^\/.]{0,}/i;
+const volPattern = /\/(vol|volume) [0-9]{2,}[^\/.\.]{0,}/i;
 
 // /chapter 01; /c 01
-const chapterPattern = /\/(chapter|c) [0-9]{2,}[^\/.]{0,}/i;
+const chapterPattern = /\/(chapter|c) [0-9]{2,}[^\/.\.]{0,}/i;
 
-function scanFolder(folderPath, limit = 0, data = {}) {
-  if (!isFolder(folderPath)) return data
+function scanFolder(folderPath, operation, limit = 0, ctx = {}) {
+  if (!isFolder(folderPath)) return ctx
 
   const matchContainer = folderPath.match(containerPattern);
   const matchVol = folderPath.match(volPattern);
@@ -28,12 +28,13 @@ function scanFolder(folderPath, limit = 0, data = {}) {
   const { files, folders } = getFolderItems(folderPath);
   const images = filterImages(files);
 
-  updateData(container, vol, chapter, images, data);
+  const { authors, containerTitle } = parseContainer(container);
+  operation(authors, containerTitle, vol, chapter, images, ctx);
 
   folders.slice(0, Number(limit) || folders.length)
-    .forEach(folder => scanFolder(folder, 0, data));
+    .forEach(folder => scanFolder(folder, operation, 0, ctx));
 
-  return data;
+  return ctx;
 }
 
 /**
@@ -55,7 +56,7 @@ function scanFolder(folderPath, limit = 0, data = {}) {
  *   authors: [a, b, c]
  * }
  */
-function updateData(container, vol, chapter, files, data) {
+function updateData(authors, container, vol, chapter, files, data) {
   if (!container) return data
 
   if (!Object.keys(data).includes(container)) {
@@ -66,7 +67,6 @@ function updateData(container, vol, chapter, files, data) {
     };
   }
 
-  const authors = getAuthors(container)
   if (!data.authors) {
     data.authors = authors
   } else {
@@ -93,13 +93,24 @@ function updateData(container, vol, chapter, files, data) {
   return data;
 }
 
-function getAuthors(title) {
-  var authorPattern = /\[[^\[^\]^//.]+\]/
-  const authors = authorPattern.exec(title)[0].replace(/[\[\]]/g, '')
+function parseContainer(container) {
+  if (!container) return {}
+
+  const authorPattern = /\[[^\[^\]^//.]+\]/
+  const result = authorPattern.exec(container)[0]
+  const authors = result
+    .replace(/[\[\]]/g, '')
     .split(',').map(a => a.trim())
-  return authors
+  const containerTitle = container.replace(authorPattern, '')
+
+  return {
+    authors,
+    containerTitle
+  }
 }
 
 module.exports = {
-  scanFolder
+  scanFolder,
+  updateData,
+  parseContainer
 };

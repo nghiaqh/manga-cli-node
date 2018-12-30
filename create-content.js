@@ -9,7 +9,7 @@ const {
 } = require('./lib/loopback');
 
 
-function getAuthorType(contentType) {
+function getArtistType(contentType) {
   switch (contentType) {
     case 'manga':
       return 'Mangaka';
@@ -22,34 +22,34 @@ function getAuthorType(contentType) {
   }
 }
 
-async function createContent (authors, containerTitle, vol, chapter, images, data) {
-  if (!authors || !containerTitle) return data;
+async function createContent (artists, containerTitle, vol, chapter, images, data) {
+  if (!artists || !containerTitle) return data;
 
-  const authorObjs = await createAuthors(authors, data);
+  const artistObjs = await createArtists(artists, data);
 }
 
-async function createAuthors(authors, data) {
+async function createArtists(artists, data) {
   let existing = [];
   let toBeCreated = [];
   let result = [];
 
-  uniq(authors).forEach(author => {
-    existing = existing.concat(data.authors.filter(dataAuthor => dataAuthor.name === author))
-    if (!existing.length) toBeCreated = toBeCreated.concat(author)
+  uniq(artists).forEach(artist => {
+    existing = existing.concat(data.artists.filter(dataArtist => dataArtist.name === artist))
+    if (!existing.length) toBeCreated = toBeCreated.concat(artist)
   })
 
-  for (const author of toBeCreated) {
-    const newAuthor = flatten(await createArtist({
-      name: author,
-      type: getAuthorType(data.type),
+  for (const artist of toBeCreated) {
+    const newArtist = flatten(await createArtist({
+      name: artist,
+      type: getArtistType(data.type),
       biography: '',
       avatar: {},
       oneshots: [],
       series: []
     }));
 
-    result = result.concat(newAuthor)
-    data.authors = data.authors.concat(newAuthor);
+    result = result.concat(newArtist)
+    data.artists = data.artists.concat(newArtist);
   }
 
   return result.concat(existing);

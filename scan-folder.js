@@ -3,7 +3,6 @@ const {
   getFolderItems,
   filterImages
 } = require('./lib/fs');
-const path = require('path');
 
 // /[author] manga title
 const containerPattern = /\/\[[^\[^\]^//.]+\][^\[^\]^//]+/;
@@ -14,8 +13,10 @@ const volPattern = /\/(vol|volume) [0-9]{2,}[^\/.\.]{0,}/i;
 // /chapter 01; /c 01
 const chapterPattern = /\/(chapter|c) [0-9]{2,}[^\/.\.]{0,}/i;
 
-function scanFolder(folderPath, operation, limit = 0, ctx = {}) {
-  if (!isFolder(folderPath)) return ctx
+async function scanFolder(folderPath, operation, limit = 0, result = {}) {
+  if (!isFolder(folderPath)) return result
+  result.authors = result.authors || []
+  result.containers = result.containers || []
 
   const matchContainer = folderPath.match(containerPattern);
   const matchVol = folderPath.match(volPattern);
@@ -29,68 +30,13 @@ function scanFolder(folderPath, operation, limit = 0, ctx = {}) {
   const images = filterImages(files);
 
   const { authors, containerTitle } = parseContainer(container);
-  operation(authors, containerTitle, vol, chapter, images, ctx);
+  await operation(authors, containerTitle, vol, chapter, images, result);
 
-  folders.slice(0, Number(limit) || folders.length)
-    .forEach(folder => scanFolder(folder, operation, 0, ctx));
-
-  return ctx;
-}
-
-/**
- *
- * @param {string} container
- * @param {string} vol
- * @param {string} chapter
- * @param {object} data
- * @return {object} data
- *
- * {
- *   container_id: {
- *     volumes: ['vol 1', 'vol 2'],
- *     chapters: ['chapter 1', 'chapter 2'],
- *     images: [
- *       {name, url, chapter, vol}
- *     ]
- *   },
- *   authors: [a, b, c]
- * }
- */
-function updateData(authors, container, vol, chapter, files, data) {
-  if (!container) return data
-
-  if (!Object.keys(data).includes(container)) {
-    data[container] = {
-      volumes: [],
-      chapters: [],
-      images: []
-    };
+  for (const folder of folders.slice(0, Number(limit) || folders.length)) {
+    await scanFolder(folder, operation, 0, result);
   }
 
-  if (!data.authors) {
-    data.authors = authors
-  } else {
-    authors.forEach(author => data.authors.includes(author) ? '' : data.authors.push(author))
-  }
-
-  if(vol && data[container].volumes.indexOf(vol) < 0) {
-    data[container].volumes.push(vol);
-  }
-
-  if(chapter && data[container].chapters.indexOf(chapter) < 0) {
-    data[container].chapters.push(chapter);
-  }
-
-  files.forEach(file => {
-    data[container].images.push({
-      name: path.parse(file).base,
-      url: file,
-      chapter: chapter,
-      vol: vol
-    })
-  });
-
-  return data;
+  return result;
 }
 
 function parseContainer(container) {
@@ -111,6 +57,5 @@ function parseContainer(container) {
 
 module.exports = {
   scanFolder,
-  updateData,
   parseContainer
 };

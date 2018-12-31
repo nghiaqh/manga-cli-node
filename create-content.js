@@ -2,7 +2,9 @@ const uniq = require('lodash/uniq');
 const flatten = require('lodash/flatten');
 const {
   createArtist,
+  updateArtist,
   createSeries,
+  createOneshot,
   createVolume,
   createChapter,
   createImage
@@ -22,10 +24,24 @@ function getArtistType(contentType) {
   }
 }
 
-async function createContent (artists, containerTitle, vol, chapter, images, data) {
-  if (!artists || !containerTitle) return data;
+async function createContent (meta, data) {
+  const {
+    artistStrings,
+    containerTitle,
+    containerType,
+    vol,
+    chapter,
+    images,
+    isOneshot,
+    isSeries
+  } = meta;
 
-  const artistObjs = await createArtists(artists, data);
+  if (!artistStrings || !containerTitle) return data;
+
+  const artists = await createArtists(artistStrings, data);
+
+  const callback = isOneshot ? createOneshot : createSeries;
+  const container = await createContainer(containerTitle, containerType, data, artists, callback);
 }
 
 async function createArtists(artists, data) {
@@ -54,6 +70,25 @@ async function createArtists(artists, data) {
 
   return result.concat(existing);
 }
+
+async function createContainer(title, type, data, artists, func) {
+  const existing = data.containers.filter(container => container.title === title);
+  const toBeCreated = existing.length ? null : title;
+  let result = existing[0];
+
+  if (toBeCreated) {
+    result = flatten(await func({
+      title: title,
+      artistId: artists[0].id,
+      description: '',
+      type: type
+    }))
+  }
+
+  return result
+}
+
+
 
 module.exports = {
   createContent

@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "repl": "node node_modules/replpad/bin/replpad.js",
-    "scan": "node bin/scan-folder.js"
+    "test": "jest"
   },
   "author": "nathanquach8x@gmail.com",
   "license": "ISC",
@@ -15,5 +14,11 @@
     "mysql": "^2.16.0",
     "winston": "^3.1.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "jest": "^23.6.0",
+    "standard": "^12.0.1"
+  },
+  "standard": {
+    "env": ["jest"]
+  }
 }

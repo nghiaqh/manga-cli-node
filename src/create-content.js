@@ -1,7 +1,8 @@
 const get = require('lodash/get')
 const {
   patchOrCreateWithCache,
-  patch
+  patch,
+  patchOrCreate
 } = require('./loopback')
 
 async function createContent (meta, images, cache = {}) {
@@ -12,13 +13,13 @@ async function createContent (meta, images, cache = {}) {
 
   switch (meta.contentType) {
     case 'manga':
-      await processManga(meta, cache)
+      await processManga(meta, cache, images)
       break
     case 'volume':
       await processVolume(meta, cache)
       break
     case 'chapter':
-      await processChapter(meta, cache)
+      await processChapter(meta, cache, images)
       break
     default:
       break
@@ -27,7 +28,7 @@ async function createContent (meta, images, cache = {}) {
   console.log('\n')
 }
 
-async function processManga (meta, cache) {
+async function processManga (meta, cache, images) {
   const artists = await patchOrCreateWithCache(meta.relation.authors, 'artists', 'name', cache)
 
   console.info('Artist created: ', artists)
@@ -64,7 +65,7 @@ async function processManga (meta, cache) {
       relation: {
         manga: manga.title
       }
-    }, cache)
+    }, cache, images)
   }
 }
 
@@ -93,7 +94,7 @@ async function processVolume (meta, cache) {
   console.info('Volume created: ', volume.title)
 }
 
-async function processChapter (meta, cache) {
+async function processChapter (meta, cache, images) {
   // get related manga
   const mangaTitle = get(meta, 'relation.manga')
   if (!mangaTitle) return
@@ -130,11 +131,25 @@ async function processChapter (meta, cache) {
 
   if (volume && volume.id) chapter.volumeId = volume.id
 
-  await patchOrCreateWithCache([chapter], 'chapters', 'title', cache)
+  const result = await patchOrCreateWithCache([chapter], 'chapters', 'title', cache)
   console.info('Chapter created: ', chapter.title)
 
   manga.modifiedAt = new Date()
   await patch('mangas', manga)
+
+  processImages(images, result[0].id)
+}
+
+function processImages (images, chapterId) {
+  if (!chapterId) return
+
+  images.forEach(async promise => {
+    const image = await promise
+    image.chapterId = chapterId
+    image.title = `${chapterId}-${image.title}`
+
+    patchOrCreate(image, 'images', 'title')
+  })
 }
 
 module.exports = {

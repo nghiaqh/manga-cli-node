@@ -1,5 +1,6 @@
 const fs = require('fs')
 const path = require('path')
+const probe = require('probe-image-size')
 
 /**
  * Return true if input is a folder path
@@ -57,6 +58,21 @@ function getFolderItems (folderPath) {
 function filterImages (files) {
   const imgRe = /.*\.(jpg|jpeg|png|gif|svg)$/
   return files.filter(file => imgRe.exec(file))
+    .map((file, index) =>
+      probe(fs.createReadStream(file)).then(({
+        width,
+        height
+      }) =>
+        ({
+          title: getItemName(file),
+          number: index + 1,
+          width,
+          height,
+          ratio: width && height ? width / height : null,
+          src: file
+        })
+      )
+    )
 }
 
 function getItemName (itemPath) {

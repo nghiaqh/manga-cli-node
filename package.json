@@ -12,6 +12,7 @@
     "chalk": "^2.4.1",
     "lodash": "^4.17.11",
     "mysql": "^2.16.0",
+    "probe-image-size": "^4.0.0",
     "winston": "^3.1.0"
   },
   "devDependencies": {
@@ -19,6 +20,8 @@
     "standard": "^12.0.1"
   },
   "standard": {
-    "env": ["jest"]
+    "env": [
+      "jest"
+    ]
   }
 }

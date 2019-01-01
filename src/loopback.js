@@ -4,7 +4,7 @@ const flatten = require('lodash/flatten')
 function request (method, url, data = {}, params = {}) {
   return axios({
     url: url,
-    baseURL: 'http://localhost:3000/',
+    baseURL: 'http://localhost:1881/',
     method: method,
     data,
     params

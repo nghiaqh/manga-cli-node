@@ -1,5 +1,5 @@
-const uniq = require('lodash/uniq');
-const flatten = require('lodash/flatten');
+const uniq = require('lodash/uniq')
+const flatten = require('lodash/flatten')
 const {
   createArtist,
   updateArtist,
@@ -8,19 +8,18 @@ const {
   createVolume,
   createChapter,
   createImage
-} = require('./lib/loopback');
+} = require('./src/loopback')
 
-
-function getArtistType(contentType) {
+function getArtistType (contentType) {
   switch (contentType) {
     case 'manga':
-      return 'Mangaka';
+      return 'Mangaka'
     case 'illustration':
-      return 'Illustrator';
+      return 'Illustrator'
     case 'comic':
-      return 'Comics artist';
+      return 'Comics artist'
     default:
-      return 'Mangaka';
+      return 'Mangaka'
   }
 }
 
@@ -34,20 +33,20 @@ async function createContent (meta, data) {
     images,
     isOneshot,
     isSeries
-  } = meta;
+  } = meta
 
-  if (!artistStrings || !containerTitle) return data;
+  if (!artistStrings || !containerTitle) return data
 
-  const artists = await createArtists(artistStrings, data);
+  const artists = await createArtists(artistStrings, data)
 
-  const callback = isOneshot ? createOneshot : createSeries;
-  const container = await createContainer(containerTitle, containerType, data, artists, callback);
+  const callback = isOneshot ? createOneshot : createSeries
+  const container = await createContainer(containerTitle, containerType, data, artists, callback)
 }
 
-async function createArtists(artists, data) {
-  let existing = [];
-  let toBeCreated = [];
-  let result = [];
+async function createArtists (artists, data) {
+  let existing = []
+  let toBeCreated = []
+  let result = []
 
   uniq(artists).forEach(artist => {
     existing = existing.concat(data.artists.filter(dataArtist => dataArtist.name === artist))
@@ -62,19 +61,19 @@ async function createArtists(artists, data) {
       avatar: {},
       oneshots: [],
       series: []
-    }));
+    }))
 
     result = result.concat(newArtist)
-    data.artists = data.artists.concat(newArtist);
+    data.artists = data.artists.concat(newArtist)
   }
 
-  return result.concat(existing);
+  return result.concat(existing)
 }
 
-async function createContainer(title, type, data, artists, func) {
-  const existing = data.containers.filter(container => container.title === title);
-  const toBeCreated = existing.length ? null : title;
-  let result = existing[0];
+async function createContainer (title, type, data, artists, func) {
+  const existing = data.containers.filter(container => container.title === title)
+  const toBeCreated = existing.length ? null : title
+  let result = existing[0]
 
   if (toBeCreated) {
     result = flatten(await func({
@@ -87,8 +86,6 @@ async function createContainer(title, type, data, artists, func) {
 
   return result
 }
-
-
 
 module.exports = {
   createContent

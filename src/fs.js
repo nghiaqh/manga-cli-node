@@ -63,6 +63,14 @@ function getItemName (itemPath) {
   return path.parse(itemPath).base.split('/').pop()
 }
 
+/**
+ * Search for metadata.json and image files inside a folder
+ * @param {String} folderPath folder path string
+ * @param {Function} processFunc function
+ * @param {Object} cache cache object
+ * @param {Number} limit limit number of subfolders to read
+ * @returns cache object
+ */
 async function scanFolder (folderPath, processFunc, cache = {}, limit = 0) {
   if (!isFolder(folderPath)) return cache
 
@@ -74,8 +82,9 @@ async function scanFolder (folderPath, processFunc, cache = {}, limit = 0) {
   const metadataFile = files.filter(file => file.indexOf('metadata.json') >= 0)
 
   if (metadataFile.length) {
+    const meta = require(metadataFile[0])
     const images = filterImages(files)
-    await processFunc(metadataFile, images, cache)
+    await processFunc(meta, images, cache)
   }
 
   for (const folder of folders.slice(0, Number(limit) || folders.length)) {

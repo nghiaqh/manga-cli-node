@@ -54,7 +54,7 @@ async function processManga (meta, cache, images) {
   console.info('Manga created: ', manga.title)
 
   // a single story
-  if (!manga.isSeries && !manga.isTankoubou) {
+  if (!manga.isSeries && !manga.isTankoubou && images) {
     await processChapter({
       title: meta.title,
       shortTitle: meta.shortTitle || meta.title,
@@ -137,7 +137,7 @@ async function processChapter (meta, cache, images) {
   manga.modifiedAt = new Date()
   await patch('mangas', manga)
 
-  processImages(images, result[0].id)
+  if (result.length && images) processImages(images, result[0].id)
 }
 
 function processImages (images, chapterId) {

@@ -29,7 +29,7 @@ async function patchOrCreate (data, contentType, whereProp) {
       id: response.data[0].id
     }, data)
     await patch(contentType, newData)
-    return [newData]
+    return newData
   } else {
     const r = await request('post', `/${contentType}`, data)
     return r.data
@@ -56,7 +56,8 @@ async function patchOrCreateWithCache (contents, contentType, whereProp, cache) 
   })
 
   for (const item of toBeCreated) {
-    const newItem = flatten(await patchOrCreate(item, contentType, whereProp))
+    const data = await patchOrCreate(item, contentType, whereProp)
+    const newItem = Array.isArray(data) ? flatten(data) : data
     existing = existing.concat(newItem)
     cache[contentType] = cache[contentType].concat(newItem)
   }

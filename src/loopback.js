@@ -1,7 +1,7 @@
 const axios = require('axios')
 const flatten = require('lodash/flatten')
 
-function request(method, url, data = {}, params = {}) {
+function request (method, url, data = {}, params = {}) {
   return axios({
     url: url,
     baseURL: 'http://localhost:8181/api/',
@@ -13,7 +13,7 @@ function request(method, url, data = {}, params = {}) {
   })
 }
 
-async function patchOrCreate(data, contentType, whereProp) {
+async function patchOrCreate (data, contentType, whereProp) {
   const response = await request('get', `/${contentType}`, {}, {
     filter: {
       where: {
@@ -36,12 +36,12 @@ async function patchOrCreate(data, contentType, whereProp) {
   }
 }
 
-async function patch(contentType, data) {
+async function patch (contentType, data) {
   const response = await request('patch', `/${contentType}/${data.id}`, data)
   return response.data
 }
 
-async function patchOrCreateWithCache(contents, contentType, whereProp, cache) {
+async function patchOrCreateWithCache (contents, contentType, whereProp, cache) {
   let existing = []
   let toBeCreated = []
 

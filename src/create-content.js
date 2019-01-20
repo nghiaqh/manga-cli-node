@@ -63,7 +63,7 @@ async function processManga (meta, cache, images) {
       number: 0,
       publishedAt: new Date(meta.publishedAt),
       relation: {
-        manga: manga.shortTitle || manga.title
+        manga: manga.title || manga.shortTitle
       }
     }, cache, images)
   }
@@ -73,7 +73,7 @@ async function processVolume (meta, cache) {
   const mangaTitle = get(meta, 'relation.manga')
   if (!mangaTitle) return
 
-  const manga = get(cache.mangas.filter(cachedManga => cachedManga.shortTitle === mangaTitle), '[0]')
+  const manga = get(cache.mangas.filter(cachedManga => cachedManga.title === mangaTitle), '[0]')
 
   if (!manga) {
     console.error('Fail to find manga in cache: ', mangaTitle)
@@ -99,7 +99,7 @@ async function processChapter (meta, cache, images) {
   const mangaTitle = get(meta, 'relation.manga')
   if (!mangaTitle) return
 
-  const manga = get(cache.mangas.filter(cachedManga => cachedManga.shortTitle === mangaTitle), '[0]')
+  const manga = get(cache.mangas.filter(cachedManga => cachedManga.title === mangaTitle), '[0]')
 
   if (!manga) {
     console.error('Fail to find manga in cache: ', mangaTitle)

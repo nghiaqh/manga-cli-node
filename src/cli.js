@@ -1,6 +1,6 @@
-const logger = require('./logger');
+const logger = require('./logger')
 
-function parseProcessArgs() {
+function parseProcessArgs () {
   if (process.argv.length < 3) {
     console.error('Missing argument: folder')
     return
@@ -15,11 +15,11 @@ function parseProcessArgs() {
       case '-l':
       case '--limit':
         options.limit = index < args.length ? args[index + 1] : 10
-        break;
+        break
       case '-t':
       case '--type':
-        options.type = args[index+1] || 'manga'
-        break;
+        options.type = args[index + 1] || 'manga'
+        break
     }
   })
 
@@ -30,31 +30,33 @@ function parseProcessArgs() {
  * Log error
  * @param {Error} err
  */
-function handleError(err) {
-  const { message, stack } = err || {};
+function handleError (err) {
+  const {
+    message,
+    stack
+  } = err || {}
   logger.error({
     message,
     stack
-  });
-  process.exit(1);
+  })
+  process.exit(1)
 }
 
-function formatLapse(millisec) {
-  let seconds = (millisec / 1000).toFixed(2);
-  let minutes = Math.floor(seconds / 60);
-  let hours = 0;
+function formatLapse (millisec) {
+  let seconds = (millisec / 1000).toFixed(2)
+  let minutes = Math.floor(seconds / 60)
+  let hours = 0
   if (minutes > 59) {
-    hours = Math.floor(minutes / 60);
-    hours = (hours >= 1) ? hours : '0' + hours;
-    minutes = minutes - (hours * 60);
-    minutes = minutes ? minutes : '0' + minutes;
+    hours = Math.floor(minutes / 60)
+    hours = (hours >= 1) ? hours : '0' + hours
+    minutes = minutes - (hours * 60)
+    minutes = minutes || '0' + minutes
   }
 
-  seconds = Math.round(seconds % 60);
-  seconds = seconds ? seconds : '0' + seconds;
-  return hours + ':' + minutes + ':' + seconds;
+  seconds = Math.round(seconds % 60)
+  seconds = seconds || '0' + seconds
+  return hours + ':' + minutes + ':' + seconds
 }
-
 
 module.exports = {
   parseProcessArgs,

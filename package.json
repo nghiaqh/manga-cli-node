@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "import": "API=http://192.168.0.2:8181/api node bin/scan-folder.js"
   },
   "author": "nathanquach8x@gmail.com",
   "license": "ISC",

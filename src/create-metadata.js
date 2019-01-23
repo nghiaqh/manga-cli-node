@@ -11,11 +11,14 @@ function createMetadataFiles (folderPath, content, limit) {
 
   let operation
   switch (content) {
+    case 'chapter':
+      operation = createChapterMetaFiles(folderPath)
+      break
     default:
       operation = createMangaMetaFile
+      operation(folderPath)
+      break
   }
-
-  operation(folderPath)
 
   const {
     folders
@@ -59,6 +62,34 @@ function createMangaMetaFile (folder) {
   }
   console.log(data)
   fs.writeFile(`${folder}/metadata.json`, JSON.stringify(data), 'utf8', () => null)
+}
+
+function createChapterMetaFiles (rootFolder) {
+  const data = require(`${rootFolder}/metadata.json`)
+  const manga = data.title
+  const {
+    publishedAt
+  } = data
+
+  return function createChapterMetaFile (folder) {
+    const folderName = path.parse(folder).base.split('/').pop()
+    const chapterNumber = folderName.split('c')[1]
+
+    const data = {
+      contentType: 'chapter',
+      number: chapterNumber,
+      title: `${manga} ${chapterNumber} - chapter ${chapterNumber}`,
+      shortTitle: `chapter ${chapterNumber}`,
+      description: '',
+      shortDescription: '',
+      publishedAt: publishedAt,
+      relation: {
+        manga: manga
+      }
+    }
+
+    fs.writeFile(`${folder}/metadata.json`, JSON.stringify(data), 'utf8', () => null)
+  }
 }
 
 module.exports = {

@@ -54,7 +54,7 @@ async function processManga (meta, cache, images) {
   console.info('Manga created: ', manga.title)
 
   // a single story
-  if (!manga.isSeries && !manga.isTankoubou && images) {
+  if (!manga.isSeries && !manga.isTankoubou && images.length) {
     await processChapter({
       title: meta.title,
       shortTitle: meta.shortTitle || meta.title,
@@ -85,7 +85,7 @@ async function processVolume (meta, cache) {
     shortTitle: meta.shortTitle || meta.title,
     description: meta.description,
     shortDescription: meta.shortDescription,
-    number: meta.number,
+    number: Number.parseInt(meta.number),
     publishedAt: new Date(meta.publishedAt),
     mangaId: manga.id
   }
@@ -124,7 +124,7 @@ async function processChapter (meta, cache, images) {
     shortTitle: meta.shortTitle || meta.title,
     description: meta.description,
     shortDescription: meta.shortDescription,
-    number: meta.number,
+    number: Number.parseInt(meta.number),
     publishedAt: new Date(meta.publishedAt || volume.publishedAt || manga.publishedAt),
     mangaId: manga.id
   }

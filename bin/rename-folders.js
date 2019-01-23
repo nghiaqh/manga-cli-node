@@ -17,6 +17,12 @@ const {
 
 if (!isFolder(folderPath)) process.exit(1)
 
+/**
+ * Rename sub directory of input folderPath
+ * Original format: author, manga title
+ * New format: [author] manga title
+ */
+
 const {
   folders
 } = getFolderItems(folderPath)

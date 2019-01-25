@@ -8,12 +8,12 @@ const {
 
 function createMangaMeta (folder) {
   const folderName = path.parse(folder).base.split('/').pop()
-  const pattern = /([^,.]+),([^,.]+)/
+  const pattern = /(\[[^\].]+\]) ([^,.]+)/
   const matches = pattern.exec(folderName)
   if (!matches) return
 
-  let authorName = folderName.split(',')[0]
-  let mangaTitle = folderName.split(`${authorName},`)[1].trim()
+  let authorName = matches[0].replace('[', '').replace(']', '')
+  let mangaTitle = matches[1]
   authorName = authorName.trim()
 
   const data = {
@@ -38,6 +38,7 @@ function createMangaMeta (folder) {
   }
   console.log(data)
   fs.writeFile(`${folder}/metadata.json`, JSON.stringify(data), 'utf8', () => null)
+  return true
 }
 
 function createVolumeMeta (rootFolder) {
@@ -122,16 +123,21 @@ function createChapterMeta (rootFolder) {
 }
 
 function createMangaMetaFiles (folderPath, limit) {
-  if (!isFolder(folderPath)) return
+  if (!isFolder(folderPath)) {
+    console.log('folderPath does not exist')
+    return
+  }
+
+  const result = createMangaMeta(folderPath)
+  if (result) return
 
   const {
     folders
   } = getFolderItems(folderPath)
-  const operator = createMangaMeta(folderPath)
 
   for (const folder of folders.slice(0, Number(limit) || folders.length)) {
     console.log(folder)
-    operator(folder)
+    createMangaMeta(folder)
   }
 }
 
@@ -142,6 +148,7 @@ function createVolumeMetaFiles (folderPath, limit) {
     folders
   } = getFolderItems(folderPath)
   const operator = createVolumeMeta(folderPath)
+  operator(folderPath)
 
   for (const folder of folders.slice(0, Number(limit) || folders.length)) {
     console.log(folder)

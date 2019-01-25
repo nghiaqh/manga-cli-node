@@ -62,6 +62,7 @@ async function processManga (meta, cache, images) {
       shortDescription: meta.shortDescription,
       number: 0,
       publishedAt: new Date(meta.publishedAt),
+      isNSFW: meta.isNSFW,
       relation: {
         manga: manga.title || manga.shortTitle
       }
@@ -86,6 +87,7 @@ async function processVolume (meta, cache) {
     description: meta.description,
     shortDescription: meta.shortDescription,
     number: Number.parseInt(meta.number),
+    isNSFW: meta.isNSFW,
     publishedAt: new Date(meta.publishedAt),
     mangaId: manga.id
   }
@@ -125,6 +127,7 @@ async function processChapter (meta, cache, images) {
     description: meta.description,
     shortDescription: meta.shortDescription,
     number: Number.parseInt(meta.number),
+    isNSFW: meta.isNSFW,
     publishedAt: new Date(meta.publishedAt || volume.publishedAt || manga.publishedAt),
     mangaId: manga.id
   }
@@ -137,16 +140,17 @@ async function processChapter (meta, cache, images) {
   manga.modifiedAt = new Date()
   await patch('mangas', manga)
 
-  if (result.length && images) processImages(images, result[0].id)
+  if (result.length && images) processImages(images, result[0].id, meta)
 }
 
-function processImages (images, chapterId) {
+function processImages (images, chapterId, meta) {
   if (!chapterId) return
 
   images.forEach(async promise => {
     const image = await promise
     image.chapterId = chapterId
     image.title = `${chapterId}-${image.title}`
+    image.isNSFW = meta.isNSFW
 
     patchOrCreate(image, 'images', 'title')
   })

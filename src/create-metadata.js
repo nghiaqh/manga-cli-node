@@ -45,10 +45,11 @@ function createVolumeMeta (rootFolder) {
   if (!fs.existsSync(`${rootFolder}/metadata.json`)) return
   const data = require(`${rootFolder}/metadata.json`)
   const manga = data.title
+  const isNSFW = data.isNSFW
 
   return function createChapterMetaFile (folder) {
     const folderName = path.parse(folder).base.split('/').pop()
-    const volNumber = folderName.split('vol')[1].trim()
+    const volNumber = folderName.split('vol')[1] && folderName.split('vol')[1].trim()
 
     if (!volNumber) return
 
@@ -60,6 +61,7 @@ function createVolumeMeta (rootFolder) {
       description: '',
       shortDescription: '',
       publishedAt: '',
+      isNSFW: isNSFW,
       relation: {
         manga: manga
       }
@@ -78,6 +80,7 @@ function createChapterMeta (rootFolder) {
   const data = require(`${rootFolder}/metadata.json`)
   let manga, volNumber
   const publishedAt = data.publishedAt
+  const isNSFW = data.isNSFW
 
   if (data.contentType === 'manga') {
     manga = data.title
@@ -108,6 +111,7 @@ function createChapterMeta (rootFolder) {
       description: '',
       shortDescription: '',
       publishedAt: publishedAt,
+      isNSFW,
       relation: {
         manga: manga,
         volume: volNumber

@@ -8,7 +8,7 @@ const {
 
 function createMangaMeta (folder) {
   const folderName = path.parse(folder).base.split('/').pop()
-  const pattern = /(\[[^\].]+\]) ([^,.]+)/
+  const pattern = /(\[[^\].\]+]) ([^[.]+)/
   const matches = pattern.exec(folderName)
   if (!matches) return
 

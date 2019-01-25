@@ -6,31 +6,7 @@ const {
   getFolderItems
 } = require('./fs')
 
-function createMetadataFiles (folderPath, content, limit) {
-  if (!isFolder(folderPath)) return
-
-  let operation
-  switch (content) {
-    case 'chapter':
-      operation = createChapterMetaFiles(folderPath)
-      break
-    default:
-      operation = createMangaMetaFile
-      operation(folderPath)
-      break
-  }
-
-  const {
-    folders
-  } = getFolderItems(folderPath)
-
-  for (const folder of folders.slice(0, Number(limit) || folders.length)) {
-    console.log(content, folder)
-    operation(folder)
-  }
-}
-
-function createMangaMetaFile (folder) {
+function createMangaMeta (folder) {
   const folderName = path.parse(folder).base.split('/').pop()
   const pattern = /([^,.]+),([^,.]+)/
   const matches = pattern.exec(folderName)
@@ -64,25 +40,25 @@ function createMangaMetaFile (folder) {
   fs.writeFile(`${folder}/metadata.json`, JSON.stringify(data), 'utf8', () => null)
 }
 
-function createChapterMetaFiles (rootFolder) {
+function createVolumeMeta (rootFolder) {
+  if (!fs.existsSync(`${rootFolder}/metadata.json`)) return
   const data = require(`${rootFolder}/metadata.json`)
   const manga = data.title
-  const {
-    publishedAt
-  } = data
 
   return function createChapterMetaFile (folder) {
     const folderName = path.parse(folder).base.split('/').pop()
-    const chapterNumber = folderName.split('c')[1]
+    const volNumber = folderName.split('vol')[1].trim()
+
+    if (!volNumber) return
 
     const data = {
-      contentType: 'chapter',
-      number: chapterNumber,
-      title: `${manga} ${chapterNumber} - chapter ${chapterNumber}`,
-      shortTitle: `chapter ${chapterNumber}`,
+      contentType: 'volume',
+      number: volNumber,
+      title: `${manga} - vol ${volNumber}`,
+      shortTitle: `vol ${volNumber}`,
       description: '',
       shortDescription: '',
-      publishedAt: publishedAt,
+      publishedAt: '',
       relation: {
         manga: manga
       }
@@ -92,6 +68,107 @@ function createChapterMetaFiles (rootFolder) {
   }
 }
 
+function createChapterMeta (rootFolder) {
+  if (!fs.existsSync(`${rootFolder}/metadata.json`)) {
+    console.log('cannot find metadata at ', rootFolder)
+    return
+  }
+
+  const data = require(`${rootFolder}/metadata.json`)
+  let manga, volNumber
+  const publishedAt = data.publishedAt
+
+  if (data.contentType === 'manga') {
+    manga = data.title
+  } else if (data.contentType === 'volume') {
+    volNumber = data.number
+    manga = data.relation.manga
+  }
+
+  return function createChapterMeta (folder) {
+    const folderName = path.parse(folder).base.split('/').pop()
+    const pattern = /(c(\d)+)|(chapter (\d)+)/i
+    const matches = pattern.exec(folderName)
+    let chapterNumber
+
+    if (matches === null) return
+    const tmp = matches[0].toLowerCase()
+    if (tmp.indexOf('chapter') > -1) {
+      chapterNumber = tmp.split('chapter')[1].trim()
+    } else {
+      chapterNumber = tmp.split('c')[1].trim()
+    }
+
+    const data = {
+      contentType: 'chapter',
+      number: chapterNumber,
+      title: `${manga} v${volNumber} - ${folderName}`,
+      shortTitle: `${folderName}`,
+      description: '',
+      shortDescription: '',
+      publishedAt: publishedAt,
+      relation: {
+        manga: manga,
+        volume: volNumber
+      }
+    }
+
+    console.log(data)
+
+    fs.writeFile(`${folder}/metadata.json`, JSON.stringify(data), 'utf8', () => null)
+
+    return true
+  }
+}
+
+function createMangaMetaFiles (folderPath, limit) {
+  if (!isFolder(folderPath)) return
+
+  const {
+    folders
+  } = getFolderItems(folderPath)
+  const operator = createMangaMeta(folderPath)
+
+  for (const folder of folders.slice(0, Number(limit) || folders.length)) {
+    console.log(folder)
+    operator(folder)
+  }
+}
+
+function createVolumeMetaFiles (folderPath, limit) {
+  if (!isFolder(folderPath)) return
+
+  const {
+    folders
+  } = getFolderItems(folderPath)
+  const operator = createVolumeMeta(folderPath)
+
+  for (const folder of folders.slice(0, Number(limit) || folders.length)) {
+    console.log(folder)
+    operator(folder)
+  }
+}
+
+function createChapterMetaFiles (folderPath, limit) {
+  if (!isFolder(folderPath)) return
+
+  const {
+    folders
+  } = getFolderItems(folderPath)
+  const operator = createChapterMeta(folderPath)
+
+  for (const folder of folders.slice(0, Number(limit) || folders.length)) {
+    const result = operator(folder)
+    if (!result) {
+      const pattern = /(c(\d)+)|(chapter (\d)+)/
+      const matches = pattern.exec(folder)
+      if (matches === null) createChapterMetaFiles(folder)
+    }
+  }
+}
+
 module.exports = {
-  createMetadataFiles
+  createMangaMetaFiles,
+  createVolumeMetaFiles,
+  createChapterMetaFiles
 }

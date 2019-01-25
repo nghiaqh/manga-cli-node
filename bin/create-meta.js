@@ -2,7 +2,9 @@ const {
   parseProcessArgs
 } = require('../src/cli')
 const {
-  createMetadataFiles
+  createMangaMetaFiles,
+  createVolumeMetaFiles,
+  createChapterMetaFiles
 } = require('../src/create-metadata')
 
 const {
@@ -22,4 +24,14 @@ const {
  * node bin/create-meta.js /mnt/d/h -t manga
  * node bin/create-meta.js /mnt/c/home/h/[author a]\ book b -t chapter
  */
-createMetadataFiles(folderPath, type, limit)
+switch (type) {
+  case 'manga':
+    createMangaMetaFiles(folderPath, limit)
+    break
+  case 'volume':
+    createVolumeMetaFiles(folderPath, limit)
+    break
+  case 'chapter':
+    createChapterMetaFiles(folderPath, limit)
+    break
+}

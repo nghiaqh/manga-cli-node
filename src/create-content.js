@@ -44,7 +44,7 @@ async function processManga (meta, cache, images) {
     isComplete: meta.isComplete,
     isTankoubou: meta.isTankoubou,
     isDoujinshi: meta.isDoujinshi,
-    isNSFW: meta.isNSFW,
+    isNSFW: meta.isNSFW || false,
     publishedAt: new Date(meta.publishedAt),
     artistId: artists[0].id
   }
@@ -62,7 +62,7 @@ async function processManga (meta, cache, images) {
       shortDescription: meta.shortDescription,
       number: 0,
       publishedAt: new Date(meta.publishedAt),
-      isNSFW: meta.isNSFW,
+      isNSFW: meta.isNSFW || false,
       relation: {
         manga: manga.title || manga.shortTitle
       }
@@ -87,7 +87,7 @@ async function processVolume (meta, cache) {
     description: meta.description,
     shortDescription: meta.shortDescription,
     number: Number.parseInt(meta.number),
-    isNSFW: meta.isNSFW,
+    isNSFW: meta.isNSFW || false,
     publishedAt: new Date(meta.publishedAt),
     mangaId: manga.id
   }
@@ -127,7 +127,7 @@ async function processChapter (meta, cache, images) {
     description: meta.description,
     shortDescription: meta.shortDescription,
     number: Number.parseInt(meta.number),
-    isNSFW: meta.isNSFW,
+    isNSFW: meta.isNSFW || false,
     publishedAt: new Date(meta.publishedAt || volume.publishedAt || manga.publishedAt),
     mangaId: manga.id
   }
@@ -150,7 +150,7 @@ function processImages (images, chapterId, meta) {
     const image = await promise
     image.chapterId = chapterId
     image.title = `${chapterId}-${image.title}`
-    image.isNSFW = meta.isNSFW
+    image.isNSFW = meta.isNSFW || false
 
     patchOrCreate(image, 'images', 'title')
   })

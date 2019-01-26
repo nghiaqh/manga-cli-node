@@ -31,6 +31,7 @@ async function patchOrCreate (data, contentType, whereProp) {
     await patch(contentType, newData)
     return newData
   } else {
+    console.log(contentType, data)
     const r = await request('post', `/${contentType}`, data)
     return r.data
   }

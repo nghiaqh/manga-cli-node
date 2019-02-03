@@ -46,6 +46,7 @@ async function processManga (meta, cache, images) {
     isDoujinshi: meta.isDoujinshi,
     isNSFW: meta.isNSFW || false,
     publishedAt: new Date(meta.publishedAt),
+    latestPublishedAt: new Date(meta.latestPublishedAt || meta.publishedAt),
     artistId: artists[0].id
   }
 
@@ -103,8 +104,7 @@ async function processChapter (meta, cache, images) {
 
   const manga = get(
     cache.mangas.filter(cachedManga =>
-      cachedManga.title === mangaTitle ||
-      cachedManga.title.includes(mangaTitle)),
+      cachedManga.title === mangaTitle),
     '[0]')
 
   if (!manga) {

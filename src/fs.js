@@ -56,7 +56,7 @@ function getFolderItems (folderPath) {
  * @returns {Array} images
  */
 function filterImages (files) {
-  const imgRe = /.*\.(jpg|jpeg|png|gif|svg)$/
+  const imgRe = /.*\.(jpg|jpeg|png|gif|svg|webp)$/
   return files.filter(file => imgRe.exec(file))
     .map((file, index) =>
       probe(fs.createReadStream(file)).then(({

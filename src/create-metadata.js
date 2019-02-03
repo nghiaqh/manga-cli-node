@@ -89,7 +89,7 @@ function createChapterMeta (rootFolder) {
     manga = data.relation.manga
   }
 
-  return function createChapterMeta (folder) {
+  return function createChapterMetaFile (folder) {
     const folderName = path.parse(folder).base.split('/').pop()
     const pattern = /(c(\d)+)|(chapter (\d)+)/i
     const matches = pattern.exec(folderName)
@@ -106,7 +106,7 @@ function createChapterMeta (rootFolder) {
     const data = {
       contentType: 'chapter',
       number: chapterNumber,
-      title: `${manga} v${volNumber} - ${folderName}`,
+      title: `${manga}${volNumber ? ' v' + volNumber : ''} - ${folderName}`,
       shortTitle: `${folderName}`,
       description: '',
       shortDescription: '',
@@ -169,7 +169,7 @@ function createChapterMetaFiles (folderPath, limit) {
   const operator = createChapterMeta(folderPath)
 
   for (const folder of folders.slice(0, Number(limit) || folders.length)) {
-    const result = operator(folder)
+    const result = operator ? operator(folder) : null
     if (!result) {
       const pattern = /(c(\d)+)|(chapter (\d)+)/
       const matches = pattern.exec(folder)

@@ -123,8 +123,10 @@ async function processChapter (meta, cache, images) {
     const volumeTitle = `${mangaTitle} - vol ${volumeNumber}`
     volume = get(
       cache.volumes.filter(cachedVol =>
-        cachedVol.title === volumeTitle ||
-        cachedVol.title.includes(volumeTitle)),
+        (cachedVol.title === volumeTitle ||
+          cachedVol.title.includes(volumeTitle)) &&
+        cachedVol.number === Number.parseInt(volumeNumber)
+      ),
       '[0]')
   }
 

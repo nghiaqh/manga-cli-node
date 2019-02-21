@@ -8,12 +8,13 @@ const {
 
 function createMangaMeta (folder) {
   const folderName = path.parse(folder).base.split('/').pop()
-  const pattern = /(\[[^\].\]+]) ([^[.]+)/
+  const pattern = /(\[[^\].]+\]) ([^[.]+)/
   const matches = pattern.exec(folderName)
+  console.log(matches)
   if (!matches) return
 
-  let authorName = matches[0].replace('[', '').replace(']', '')
-  let mangaTitle = matches[1]
+  let authorName = matches[1].replace('[', '').replace(']', '')
+  let mangaTitle = matches[2]
   authorName = authorName.trim()
 
   const data = {

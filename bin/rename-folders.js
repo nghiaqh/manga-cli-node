@@ -28,15 +28,13 @@ const {
 } = getFolderItems(folderPath)
 
 for (const folder of folders.slice(0, Number(limit) || folders.length)) {
-  // console.log(folder)
-  // const folderName = path.parse(folder).base.split('/').pop()
-  // const pattern = /\[(\[[^,.]+\]) [^[.]+\]/
-  // const matches = pattern.exec(folderName)
-  // if (!matches) continue
-  // else {
-  //   console.log(matches[0])
-  //   const newName = folderName.replace('[[', '[')
-  //   const newPath = folder.replace(folderName, newName)
-  //   fs.renameSync(folder, newPath)
-  // }
+  const folderName = path.parse(folder).base.split('/').pop()
+  const pattern = /([^,.]+), [^,.]+/
+  const matches = pattern.exec(folderName)
+  if (!matches) continue
+  else {
+    const newName = folderName.replace(`${matches[0]},`, `[${matches[0]}]`)
+    const newPath = folder.replace(folderName, newName)
+    fs.renameSync(folder, newPath)
+  }
 }

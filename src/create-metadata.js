@@ -38,13 +38,14 @@ function createMangaMeta (folder) {
     }
   }
   console.log(data)
-  fs.writeFile(`${folder}/metadata.json`, JSON.stringify(data), 'utf8', () => null)
+  fs.writeFile(path.join(folder, 'metadata.json'), JSON.stringify(data), 'utf8', () => null)
   return true
 }
 
 function createVolumeMeta (rootFolder) {
-  if (!fs.existsSync(`${rootFolder}/metadata.json`)) return
-  const data = require(`${rootFolder}/metadata.json`)
+  const metaFile = path.join(rootFolder, 'metadata.json')
+  if (!fs.existsSync(metaFile)) return
+  const data = require(metaFile)
   const manga = data.title
   const isNSFW = data.isNSFW
 
@@ -68,17 +69,19 @@ function createVolumeMeta (rootFolder) {
       }
     }
 
-    fs.writeFile(`${folder}/metadata.json`, JSON.stringify(data), 'utf8', () => null)
+    fs.writeFile(path.join(folder, 'metadata.json'), JSON.stringify(data), 'utf8', () => null)
   }
 }
 
 function createChapterMeta (rootFolder) {
-  if (!fs.existsSync(`${rootFolder}/metadata.json`)) {
+  const metaFile = path.join(rootFolder, 'metadata.json')
+
+  if (!fs.existsSync(metaFile)) {
     console.log('cannot find metadata at ', rootFolder)
     return
   }
 
-  const data = require(`${rootFolder}/metadata.json`)
+  const data = require(metaFile)
   let manga, volNumber
   const publishedAt = data.publishedAt
   const isNSFW = data.isNSFW
@@ -121,7 +124,7 @@ function createChapterMeta (rootFolder) {
 
     console.log(data)
 
-    fs.writeFile(`${folder}/metadata.json`, JSON.stringify(data), 'utf8', () => null)
+    fs.writeFile(path.join(folder, 'metadata.json'), JSON.stringify(data), 'utf8', () => null)
 
     return true
   }

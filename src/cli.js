@@ -1,5 +1,3 @@
-const logger = require('./logger')
-
 function parseProcessArgs () {
   if (process.argv.length < 3) {
     console.error('Missing argument: folder')
@@ -35,6 +33,7 @@ function handleError (err) {
     message,
     stack
   } = err || {}
+  const logger = require('./logger')
   logger.error({
     message,
     stack

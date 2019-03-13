@@ -11,11 +11,12 @@ const {
 } = require('../src/cli')
 
 const {
-  folderPath,
+  folderPath: inputPath,
   limit
 } = parseProcessArgs()
 
-if (!isFolder(folderPath)) process.exit(1)
+if (!isFolder(inputPath)) process.exit(1)
+const folderPath = path.resolve(inputPath)
 
 /**
  * Rename sub directory of input folderPath

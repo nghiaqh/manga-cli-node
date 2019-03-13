@@ -11,15 +11,15 @@ const {
 } = require('../src/cli')
 
 const {
-  folderPath
+  folderPath: inputPath
 } = parseProcessArgs()
 
-if (!isFolder(folderPath)) process.exit(1)
+if (!isFolder(inputPath)) process.exit(1)
+const folderPath = path.resolve(inputPath)
 
 /**
  * Rename files inside input folderPath 00000 to files.length
  */
-
 const {
   files
 } = getFolderItems(folderPath)

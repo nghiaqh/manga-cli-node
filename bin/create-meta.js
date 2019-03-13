@@ -1,3 +1,4 @@
+const path = require('path')
 const {
   parseProcessArgs
 } = require('../src/cli')
@@ -8,10 +9,12 @@ const {
 } = require('../src/create-metadata')
 
 const {
-  folderPath,
+  folderPath: inputPath,
   limit,
   type
 } = parseProcessArgs()
+
+const folderPath = path.resolve(inputPath)
 
 /**
  * Create metadata.json for manga and chapter

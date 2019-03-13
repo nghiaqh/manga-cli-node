@@ -1,3 +1,4 @@
+const path = require('path')
 const {
   parseProcessArgs
 } = require('../src/cli')
@@ -9,9 +10,11 @@ const {
 } = require('../src/create-content')
 
 const {
-  folderPath,
+  folderPath: inputPath,
   limit
 } = parseProcessArgs()
+
+const folderPath = path.resolve(inputPath)
 
 /**
  * Scan folders and create database record
